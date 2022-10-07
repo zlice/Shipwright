@@ -33,6 +33,7 @@ namespace Ship {
 		private:
 			std::string ControllerName = "Unknown";
 			SDL_GameController* Cont;
+			SDL_Joystick* Joy;
 			int32_t physicalSlot;
 			bool supportsGyro;
 			void NormalizeStickAxis(SDL_GameControllerAxis axisX, SDL_GameControllerAxis axisY, int16_t axisThreshold, int32_t virtualSlot);

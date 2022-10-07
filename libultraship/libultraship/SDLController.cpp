@@ -18,6 +18,7 @@ namespace Ship {
 
     bool SDLController::Open() {
         const auto NewCont = SDL_GameControllerOpen(physicalSlot);
+        const auto NewJoy = SDL_JoystickOpen(physicalSlot);
 
         // We failed to load the controller. Go to next.
         if (NewCont == nullptr) {
@@ -34,6 +35,7 @@ namespace Ship {
         char GuidBuf[33];
         SDL_JoystickGetGUIDString(SDL_JoystickGetDeviceGUID(physicalSlot), GuidBuf, sizeof(GuidBuf));
         Cont = NewCont;
+        Joy = NewJoy;
 
 #ifdef __SWITCH__
         GUID = StringHelper::Sprintf("%s:%d", GuidBuf, physicalSlot);
@@ -53,6 +55,7 @@ namespace Ship {
             SDL_GameControllerClose(Cont);
         }
         Cont = nullptr;
+        Joy = nullptr;
 
         return true;
     }
@@ -104,9 +107,11 @@ namespace Ship {
 
     int32_t SDLController::ReadRawPress() {
         SDL_GameControllerUpdate();
+        SDL_Event event;
 
         for (int32_t i = SDL_CONTROLLER_BUTTON_A; i < SDL_CONTROLLER_BUTTON_MAX; i++) {
-            if (SDL_GameControllerGetButton(Cont, static_cast<SDL_GameControllerButton>(i))) {
+            //if (SDL_GameControllerGetButton(Cont, static_cast<SDL_GameControllerButton>(i))) {
+            if (SDL_JoystickGetButton(Joy, i) ) {
                 return i;
             }
         }
@@ -180,7 +185,8 @@ namespace Ship {
 
         for (int32_t i = SDL_CONTROLLER_BUTTON_A; i < SDL_CONTROLLER_BUTTON_MAX; i++) {
             if (profile->Mappings.contains(i)) {
-                if (SDL_GameControllerGetButton(Cont, static_cast<SDL_GameControllerButton>(i))) {
+                //if (SDL_GameControllerGetButton(Cont, static_cast<SDL_GameControllerButton>(i))) {
+                if (SDL_JoystickGetButton(Joy, i) ) {
                     getPressedButtons(virtualSlot) |= profile->Mappings[i];
                 }
                 else {
